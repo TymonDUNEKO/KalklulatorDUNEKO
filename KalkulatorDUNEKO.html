@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator DUNEKO</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            display: flex; 
+            align-items: center; 
+            background-color: #000000;
+            color: white;
+            font-size: 7px;
+            font-family: Arial, Helvetica, sans-serif;
+            width: 100%;       
+            padding: 10px 0;  
+            box-sizing: border-box; 
+            height: 100px;
+            position: relative; 
+        }
+
+        .logo {
+            margin-right: 20px; 
+            position: absolute; 
+            left: 20px; 
+        }
+
+        .spacer {
+            width: 100%; 
+            height: 20px; 
+            background-color: rgba(255, 255, 255, 0.5); 
+        }
+
+        h1 {
+            flex: 1; 
+            text-align: center; 
+            margin: 0; 
+        }
+
+        .form-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-container input, .form-container select {
+            padding: 5px;
+            font-size: 1em;
+        }
+
+        .result-container {
+            text-align: right;
+            margin-top: 20px;
+            height: 100px;
+            padding: 20px;
+            position: sticky;
+            bottom: 0;
+        }
+
+        button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        #addRow {
+            margin-bottom: 20px;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .remove-btn {
+            cursor: pointer;
+            color: red;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .calculate-btn {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #000000;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            text-align: center;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            font-size: 13px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #wynik {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <img src="duneko_vector-logo.svg" alt="Logo" class="logo">
+        <h1>Kalkulator do Termomodernizacji</h1>
+    </header>
+
+    <div class="spacer"></div>
+
+    <div id="form-rows">
+        <!-- Pierwszy wiersz formularza -->
+        <div class="form-container" id="row-0">
+            <span class="remove-btn" onclick="removeRow(0)">−</span>
+            <!-- Rodzaj usługi -->
+            <label for="usluga-0">Rodzaj usługi:</label>
+            <select id="usluga-0" name="usluga" onchange="toggleFields(0)">
+                <option value="">-- Wybierz --</option>
+                <option value="ocieplenie_stropu">Ocieplenie stropu</option>
+                <option value="ocieplenie_dachu">Ocieplenie dachu</option>
+                <option value="ocieplenie_scian">Ocieplenie ścian zewnętrznych</option>
+                <option value="okna">Okna</option>
+                <option value="drzwi">Drzwi</option>
+            </select>
+
+            <!-- Metraż -->
+            <div id="metraz_row-0" class="hidden">
+                <label for="metraz-0">Metraż (m²):</label>
+                <input type="number" id="metraz-0" name="metraz" placeholder="Podaj metraż">
+            </div>
+
+            <!-- Typ okna -->
+            <div id="okna_typ_row-0" class="hidden">
+                <label for="okna-typ-0">Typ okna:</label>
+                <select id="okna-typ-0">
+                    <option value="">-- Wybierz typ okna --</option>
+                    <option value="pojedyncze">Pojedyncze rozwierno-uchylne</option>
+                    <option value="podwojne">Podwójne rozwierno-uchylne</option>
+                    <option value="potrojne">Potrójne rozwierno-uchylne</option>
+                </select>
+            </div>
+
+            <!-- Ilość okien -->
+            <div id="okna_ilosc_row-0" class="hidden">
+                <label for="okna-ilosc-0">Ilość okien:</label>
+                <input type="number" id="okna-ilosc-0" placeholder="Podaj ilość okien">
+            </div>
+
+            <!-- Ilość drzwi -->
+            <div id="drzwi_ilosc_row-0" class="hidden">
+                <label for="drzwi-ilosc-0">Ilość drzwi:</label>
+                <input type="number" id="drzwi-ilosc-0" placeholder="Podaj ilość drzwi">
+            </div>
+
+            <!-- Poziom jakości -->
+            <label for="poziom-0">Poziom jakości:</label>
+            <select id="poziom-0" name="poziom">
+                <option value="">-- Wybierz poziom --</option>
+                <option value="najnizszy">Najniższy</option>
+                <option value="podwyzszony">Podwyższony</option>
+                <option value="najwyzszy">Najwyższy</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Plusik do dodawania wierszy -->
+    <div>
+        <span id="addRow">+</span>
+    </div>
+
+    <!-- Okienko z wynikiem -->
+    <div class="result-container">
+        <label for="wynik">Wynik:</label>
+        <input type="text" id="wynik" name="wynik" readonly>  
+        <!-- Przycisk Oblicz -->
+        <button class="calculate-btn" onclick="calculateAll()">Oblicz</button>
+    </div>
+
+    <footer>
+        <p>2024 © Duneko Wszelkie prawa zastrzeżone</p>
+    </footer>
+
+    <script>
+        let rowCount = 1; // Licznik wierszy
+        let totalSum = 0; // Globalna suma wyników
+        let rowValues = {}; // Obiekt do przechowywania wartości dla każdego wiersza
+
+        // Funkcja do przełączania widoczności pól w zależności od wybranej usługi
+        function toggleFields(rowId) {
+            const usluga = document.getElementById(`usluga-${rowId}`).value;
+            const metrazRow = document.getElementById(`metraz_row-${rowId}`);
+            const oknaTypRow = document.getElementById(`okna_typ_row-${rowId}`);
+            const oknaIloscRow = document.getElementById(`okna_ilosc_row-${rowId}`);
+            const drzwiIloscRow = document.getElementById(`drzwi_ilosc_row-${rowId}`);
+
+            // Resetowanie widoczności
+            metrazRow.classList.add('hidden');
+            oknaTypRow.classList.add('hidden');
+            oknaIloscRow.classList.add('hidden');
+            drzwiIloscRow.classList.add('hidden');
+
+            // Pokaż odpowiednie pola w zależności od usługi
+            if (usluga === 'ocieplenie_stropu' || usluga === 'ocieplenie_dachu' || usluga === 'ocieplenie_scian') {
+                metrazRow.classList.remove('hidden');
+            } else if (usluga === 'okna') {
+                oknaTypRow.classList.remove('hidden');
+                oknaIloscRow.classList.remove('hidden');
+            } else if (usluga === 'drzwi') {
+                drzwiIloscRow.classList.remove('hidden');
+            }
+        }
+
+        // Funkcja do dodawania nowego wiersza
+        document.getElementById('addRow').addEventListener('click', function () {
+            const formRows = document.getElementById('form-rows');
+            const newRow = document.createElement('div');
+            newRow.classList.add('form-container');
+            newRow.id = `row-${rowCount}`;
+            newRow.innerHTML = `
+                <span class="remove-btn" onclick="removeRow(${rowCount})">−</span>
+                <label for="usluga-${rowCount}">Rodzaj usługi:</label>
+                <select id="usluga-${rowCount}" name="usluga" onchange="toggleFields(${rowCount})">
+                    <option value="">-- Wybierz --</option>
+                    <option value="ocieplenie_stropu">Ocieplenie stropu</option>
+                    <option value="ocieplenie_dachu">Ocieplenie dachu</option>
+                    <option value="ocieplenie_scian">Ocieplenie ścian zewnętrznych</option>
+                    <option value="okna">Okna</option>
+                    <option value="drzwi">Drzwi</option>
+                </select>
+
+                <div id="metraz_row-${rowCount}" class="hidden">
+                    <label for="metraz-${rowCount}">Metraż (m²):</label>
+                    <input type="number" id="metraz-${rowCount}" name="metraz" placeholder="Podaj metraż">
+                </div>
+
+                <div id="okna_typ_row-${rowCount}" class="hidden">
+                    <label for="okna-typ-${rowCount}">Typ okna:</label>
+                    <select id="okna-typ-${rowCount}">
+                        <option value="">-- Wybierz typ okna --</option>
+                        <option value="pojedyncze">Pojedyncze rozwierno-uchylne</option>
+                        <option value="podwojne">Podwójne rozwierno-uchylne</option>
+                        <option value="potrojne">Potrójne rozwierno-uchylne</option>
+                    </select>
+                </div>
+
+                <div id="okna_ilosc_row-${rowCount}" class="hidden">
+                    <label for="okna-ilosc-${rowCount}">Ilość okien:</label>
+                    <input type="number" id="okna-ilosc-${rowCount}" placeholder="Podaj ilość okien">
+                </div>
+
+                <div id="drzwi_ilosc_row-${rowCount}" class="hidden">
+                    <label for="drzwi-ilosc-${rowCount}">Ilość drzwi:</label>
+                    <input type="number" id="drzwi-ilosc-${rowCount}" placeholder="Podaj ilość drzwi">
+                </div>
+
+                <label for="poziom-${rowCount}">Poziom jakości:</label>
+                <select id="poziom-${rowCount}" name="poziom">
+                    <option value="">-- Wybierz poziom --</option>
+                    <option value="najnizszy">Najniższy</option>
+                    <option value="podwyzszony">Podwyższony</option>
+                    <option value="najwyzszy">Najwyższy</option>
+                </select>
+            `;
+
+            formRows.appendChild(newRow);
+            rowCount++;
+        });
+
+         // Funkcja do usuwania wiersza
+         function removeRow(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            if (row) {
+                row.remove();
+                // Odejmowanie wartości usuniętego wiersza od sumy
+                if (rowValues[rowId]) {
+                    totalSum -= rowValues[rowId];
+                    document.getElementById('wynik').value = totalSum.toFixed(2);
+                }
+            }
+        }
+
+        // Funkcje obliczeń dla ocieplenia stropu, dachu i ścian
+        function calculateOcieplenieStropu(metraz, poziom) {
+            if (poziom === 'najnizszy') {
+                if (metraz <= 130) return metraz * 382;
+                else if (metraz <= 190) return metraz * 248;
+                else if (metraz <= 300) return metraz * 197;
+                else return metraz * 160;
+            } else if (poziom === 'podwyzszony') {
+                if (metraz <= 150) return metraz * 400;
+                else if (metraz <= 200) return metraz * 300;
+                else if (metraz <= 350) return metraz * 220;
+                else return metraz * 180;
+            } else if (poziom === 'najwyzszy') {
+                if (metraz <= 150) return metraz * 461.12;
+                else if (metraz <= 200) return metraz * 328.6;
+                else if (metraz <= 250) return metraz * 290;
+                else if (metraz <= 300) return metraz * 240;
+                else if (metraz <= 400) return metraz * 193;
+                else return metraz * 180;
+            }
+        }
+
+        function calculateOcieplenieDachu(metraz, poziom) {
+            if (poziom === 'najnizszy') {
+                if (metraz <= 130) return metraz * 500;
+                else if (metraz <= 190) return metraz * 350;
+                else if (metraz <= 300) return metraz * 300;
+                else return metraz * 250;
+            } else if (poziom === 'podwyzszony') {
+                if (metraz <= 150) return metraz * 600;
+                else if (metraz <= 200) return metraz * 450;
+                else if (metraz <= 350) return metraz * 400;
+                else return metraz * 300;
+            } else if (poziom === 'najwyzszy') {
+                if (metraz <= 150) return metraz * 700;
+                else if (metraz <= 200) return metraz * 550;
+                else if (metraz <= 250) return metraz * 500;
+                else if (metraz <= 300) return metraz * 450;
+                else if (metraz <= 400) return metraz * 400;
+                else return metraz * 350;
+            }
+        }
+
+        function calculateOcieplenieScian(metraz, poziom) {
+            if (poziom === 'najnizszy') {
+                if (metraz <= 130) return metraz * 300;
+                else if (metraz <= 190) return metraz * 250;
+                else if (metraz <= 300) return metraz * 200;
+                else return metraz * 180;
+            } else if (poziom === 'podwyzszony') {
+                if (metraz <= 150) return metraz * 350;
+                else if (metraz <= 200) return metraz * 300;
+                else if (metraz <= 350) return metraz * 250;
+                else return metraz * 200;
+            } else if (poziom === 'najwyzszy') {
+                if (metraz <= 150) return metraz * 400;
+                else if (metraz <= 200) return metraz * 350;
+                else if (metraz <= 250) return metraz * 300;
+                else if (metraz <= 300) return metraz * 250;
+                else if (metraz <= 400) return metraz * 220;
+                else return metraz * 200;
+            }
+        }
+
+        // Funkcja obliczająca wynik dla okien
+        function calculateOkna(ilosc, typ, poziom) {
+            let wynik = 0;
+            if (typ === 'pojedyncze') {
+                if (poziom === 'najnizszy') wynik = ilosc * 744;
+                else if (poziom === 'podwyzszony') wynik = ilosc * 806;
+                else if (poziom === 'najwyzszy') wynik = ilosc * 930;
+            } else if (typ === 'podwojne') {
+                if (poziom === 'najnizszy') wynik = ilosc * 1975.2;
+                else if (poziom === 'podwyzszony') wynik = ilosc * 2139.8;
+                else if (poziom === 'najwyzszy') wynik = ilosc * 2469;
+            } else if (typ === 'potrojne') {
+                if (poziom === 'najnizszy') wynik = ilosc * 1800;
+                else if (poziom === 'podwyzszony') wynik = ilosc * 1950;
+                else if (poziom === 'najwyzszy') wynik = ilosc * 2250;
+            }
+            return wynik;
+        }
+
+        // Funkcja obliczająca wynik dla drzwi
+        function calculateDrzwi(ilosc, poziom) {
+            let wynik = 0;
+            if (poziom === 'najnizszy') wynik = ilosc * 4800;
+            else if (poziom === 'podwyzszony') wynik = ilosc * 5200;
+            else if (poziom === 'najwyzszy') wynik = ilosc * 6000;
+            return wynik;
+        }
+
+        // Funkcja do przeliczania wszystkich wierszy
+        function calculateAll() {
+            totalSum = 0;
+
+            for (let i = 0; i < rowCount; i++) {
+                const usluga = document.getElementById(`usluga-${i}`);
+                const metraz = document.getElementById(`metraz-${i}`);
+                const poziom = document.getElementById(`poziom-${i}`);
+                const oknaTyp = document.getElementById(`okna-typ-${i}`);
+                const oknaIlosc = document.getElementById(`okna-ilosc-${i}`);
+                const drzwiIlosc = document.getElementById(`drzwi-ilosc-${i}`);
+
+                if (usluga && usluga.value && poziom && poziom.value) {
+                    let wynik = 0;
+
+                    if (usluga.value === 'ocieplenie_stropu' && metraz && metraz.value) {
+                        wynik = calculateOcieplenieStropu(parseFloat(metraz.value), poziom.value);
+                    } else if (usluga.value === 'ocieplenie_dachu' && metraz && metraz.value) {
+                        wynik = calculateOcieplenieDachu(parseFloat(metraz.value), poziom.value);
+                    } else if (usluga.value === 'ocieplenie_scian' && metraz && metraz.value) {
+                        wynik = calculateOcieplenieScian(parseFloat(metraz.value), poziom.value);
+                    } else if (usluga.value === 'okna' && oknaTyp && oknaTyp.value && oknaIlosc && oknaIlosc.value) {
+                        wynik = calculateOkna(parseInt(oknaIlosc.value), oknaTyp.value, poziom.value);
+                    } else if (usluga.value === 'drzwi' && drzwiIlosc && drzwiIlosc.value) {
+                        wynik = calculateDrzwi(parseInt(drzwiIlosc.value), poziom.value);
+                    }
+
+                    // Aktualizowanie wartości dla danego wiersza i sumy
+                    if (wynik) {
+                        rowValues[i] = wynik;
+                        totalSum += wynik;
+                    }
+                }
+            }
+
+            document.getElementById('wynik').value = totalSum.toFixed(2);
+        }
+    </script>
+
+</body>
+</html>
